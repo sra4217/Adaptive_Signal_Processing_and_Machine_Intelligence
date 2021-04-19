@@ -1,0 +1,45 @@
+fSample = 1;
+nSamples = 1024;
+t = (0: nSamples - 1) / fSample;
+fSine = [0.1, 0.27];
+waveA = sin(2 * pi * fSine(1) * t) + sin(2 * pi * fSine(2) * t);
+waveB = [1, zeros(1, nSamples - 1)];
+
+[acfA, ~] = xcorr(waveA, 'biased');
+[acfB, lag] = xcorr(waveB, 'biased');
+f1 = lag ./ (2 * nSamples) * fSample;
+psdA1 = abs(fftshift(fft(acfA)));
+psdB1 = abs(fftshift(fft(acfB)));
+
+psdA2 = abs(fftshift(fft(waveA))) .^ 2 / nSamples;
+psdB2 = abs(fftshift(fft(waveB))) .^ 2 / nSamples;
+f2 = (-nSamples / 2: nSamples/ 2 - 1) * (fSample / nSamples);
+
+figure;
+subplot(3, 1, 1);
+plot(lag, acfA, 'LineWidth', 2);
+hold on;
+plot(lag, acfB, 'LineWidth', 2);
+grid on; grid minor;
+legend('Sinusoids', 'Impulse');
+title('ACF Trend');
+xlabel('Lags (sample)');
+ylabel('ACF');
+subplot(3, 1, 2);
+plot(f1, psdA1, 'LineWidth', 2);
+hold on;
+plot(f2, psdA2, 'LineWidth', 2);
+grid on; grid minor;
+legend('Definition 1', 'Definition 2');
+title('Direct and indirect periodogram of sinusoids');
+xlabel('Normalised frequency');
+ylabel('PSD');
+subplot(3, 1, 3);
+plot(f1, psdB1, 'LineWidth', 2);
+hold on;
+plot(f2, psdB2, '--', 'LineWidth', 4);
+grid on; grid minor;
+legend('Definition 1', 'Definition 2');
+title('Direct and indirect periodogram of impulse');
+xlabel('Normalised frequency');
+ylabel('PSD');
